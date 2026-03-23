@@ -156,30 +156,54 @@
         <p class="section-intro reveal">
           Create an account and log in to manage reminders, schedules, and family health updates.
         </p>
-        <div class="auth-grid">
-          <article class="auth-card reveal">
-            <h3>Sign Up</h3>
-            <form id="signupForm" class="auth-form">
-              <input id="signupName" type="text" placeholder="Full Name" required />
-              <input id="signupEmail" type="email" placeholder="Email" required />
-              <input id="signupPassword" type="password" placeholder="Password" minlength="4" required />
-              <select id="signupRole" required>
-                <option value="owner">Parent / Owner</option>
-                <option value="member">Family Member</option>
-              </select>
-              <button type="submit" class="btn btn-primary">Create Account</button>
-            </form>
-          </article>
-          <article class="auth-card reveal">
-            <h3>Login</h3>
-            <form id="loginForm" class="auth-form">
-              <input id="loginEmail" type="email" placeholder="Email" required />
-              <input id="loginPassword" type="password" placeholder="Password" required />
-              <button type="submit" class="btn btn-primary">Login</button>
-            </form>
-            <div id="sessionInfo" class="session-info"></div>
-            <button id="logoutBtn" class="btn btn-secondary hidden" type="button">Logout</button>
-          </article>
+        <div class="outer-container reveal">
+          <div class="step-circle-container stepper-shell" data-stepper="auth" data-total-steps="2">
+            <div class="step-indicator-row">
+              <button class="step-indicator is-active" type="button" data-step-target="1" aria-label="Sign up step">
+                <span class="step-indicator-inner"><span class="active-dot"></span></span>
+              </button>
+              <span class="step-connector"><span class="step-connector-inner"></span></span>
+              <button class="step-indicator" type="button" data-step-target="2" aria-label="Login step">
+                <span class="step-indicator-inner"><span class="step-number">2</span></span>
+              </button>
+            </div>
+
+            <div class="step-content-default">
+              <div class="step-default step-panel is-active" data-step="1">
+                <article class="auth-card">
+                  <h3>Create Account</h3>
+                  <form id="signupForm" class="auth-form">
+                    <input id="signupName" type="text" placeholder="Full Name" required />
+                    <input id="signupEmail" type="email" placeholder="Email" required />
+                    <input id="signupPassword" type="password" placeholder="Password" minlength="4" required />
+                    <select id="signupRole" required>
+                      <option value="owner">Parent / Owner</option>
+                      <option value="member">Family Member</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                  </form>
+                </article>
+              </div>
+              <div class="step-default step-panel" data-step="2">
+                <article class="auth-card">
+                  <h3>Login</h3>
+                  <form id="loginForm" class="auth-form">
+                    <input id="loginEmail" type="email" placeholder="Email" required />
+                    <input id="loginPassword" type="password" placeholder="Password" required />
+                    <button type="submit" class="btn btn-primary">Login</button>
+                  </form>
+                  <div id="sessionInfo" class="session-info"></div>
+                  <button id="logoutBtn" class="btn btn-secondary hidden" type="button">Logout</button>
+                </article>
+              </div>
+            </div>
+            <div class="footer-container">
+              <div class="footer-nav spread">
+                <button class="back-button" type="button" data-stepper-back>Previous</button>
+                <button class="next-button" type="button" data-stepper-next>Next</button>
+              </div>
+            </div>
+          </div>
         </div>
         <p id="authMessage" class="auth-message"></p>
       </div>
@@ -220,21 +244,44 @@
 
         <div class="dashboard-panel reveal">
           <h3>Reminder Configuration & Routine Schedules</h3>
-          <form id="reminderForm" class="reminder-form">
-            <input id="reminderTitle" type="text" placeholder="Reminder title (Medicine/Checkup)" required />
-            <select id="reminderMember">
-              <option value="all">All Members</option>
-            </select>
-            <select id="reminderType">
-              <option value="medicine">Medicine</option>
-              <option value="checkup">Checkup</option>
-              <option value="appointment">Appointment</option>
-            </select>
-            <input id="reminderTime" type="time" required />
-            <button type="submit" class="btn btn-primary">Add Routine</button>
-          </form>
-          <ul id="reminderList" class="reminder-list"></ul>
-          <p id="reminderEmpty" class="empty-state">No reminders configured yet.</p>
+          <div class="step-circle-container stepper-shell" data-stepper="reminder" data-total-steps="2">
+            <div class="step-indicator-row">
+              <button class="step-indicator is-active" type="button" data-step-target="1" aria-label="Configure reminder step">
+                <span class="step-indicator-inner"><span class="active-dot"></span></span>
+              </button>
+              <span class="step-connector"><span class="step-connector-inner"></span></span>
+              <button class="step-indicator" type="button" data-step-target="2" aria-label="View routine step">
+                <span class="step-indicator-inner"><span class="step-number">2</span></span>
+              </button>
+            </div>
+            <div class="step-content-default">
+              <div class="step-default step-panel is-active" data-step="1">
+                <form id="reminderForm" class="reminder-form">
+                  <input id="reminderTitle" type="text" placeholder="Reminder title (Medicine/Checkup)" required />
+                  <select id="reminderMember">
+                    <option value="all">All Members</option>
+                  </select>
+                  <select id="reminderType">
+                    <option value="medicine">Medicine</option>
+                    <option value="checkup">Checkup</option>
+                    <option value="appointment">Appointment</option>
+                  </select>
+                  <input id="reminderTime" type="time" required />
+                  <button type="submit" class="btn btn-primary">Add Routine</button>
+                </form>
+              </div>
+              <div class="step-default step-panel" data-step="2">
+                <ul id="reminderList" class="reminder-list"></ul>
+                <p id="reminderEmpty" class="empty-state">No reminders configured yet.</p>
+              </div>
+            </div>
+            <div class="footer-container">
+              <div class="footer-nav spread">
+                <button class="back-button" type="button" data-stepper-back>Previous</button>
+                <button class="next-button" type="button" data-stepper-next>Next</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -292,12 +339,48 @@
         <h2 class="reveal">Team</h2>
         <div class="team-grid">
           <article class="team-card reveal">
-            <h3>Hemant Moral</h3>
-            <p>Project Contributor</p>
+            <div class="pc-card-wrapper" data-profile-card>
+              <div class="pc-behind"></div>
+              <div class="pc-card-shell">
+                <section class="pc-card">
+                  <div class="pc-inside">
+                    <div class="pc-shine"></div>
+                    <div class="pc-glare"></div>
+                    <div class="pc-content pc-avatar-content">
+                      <img class="avatar" src="assets/hemant.png" alt="Hemant Moral avatar" loading="lazy" />
+                    </div>
+                    <div class="pc-content">
+                      <div class="pc-details">
+                        <h3>Hemant Moral</h3>
+                        <p>Developer</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
           </article>
           <article class="team-card reveal">
-            <h3>Shaurya Kaushal</h3>
-            <p>Project Contributor</p>
+            <div class="pc-card-wrapper" data-profile-card>
+              <div class="pc-behind"></div>
+              <div class="pc-card-shell">
+                <section class="pc-card">
+                  <div class="pc-inside">
+                    <div class="pc-shine"></div>
+                    <div class="pc-glare"></div>
+                    <div class="pc-content pc-avatar-content">
+                      <img class="avatar" src="assets/shaurya.png" alt="Shaurya Kaushal avatar" loading="lazy" />
+                    </div>
+                    <div class="pc-content">
+                      <div class="pc-details">
+                        <h3>Shaurya Kaushal</h3>
+                        <p>Developer</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
           </article>
         </div>
       </div>

@@ -18,6 +18,106 @@ if (menuToggle && navLinks) {
   });
 }
 
+// Generic vanilla stepper (used for auth and reminders)
+function initSteppers() {
+  const steppers = document.querySelectorAll(".stepper-shell");
+  steppers.forEach((stepper) => {
+    const total = Number(stepper.getAttribute("data-total-steps")) || 1;
+    const indicators = Array.from(stepper.querySelectorAll(".step-indicator"));
+    const connectors = Array.from(stepper.querySelectorAll(".step-connector-inner"));
+    const panels = Array.from(stepper.querySelectorAll(".step-panel"));
+    const backBtn = stepper.querySelector("[data-stepper-back]");
+    const nextBtn = stepper.querySelector("[data-stepper-next]");
+    let current = 1;
+
+    function render() {
+      panels.forEach((panel) => {
+        panel.classList.toggle("is-active", Number(panel.getAttribute("data-step")) === current);
+      });
+      indicators.forEach((indicator, idx) => {
+        indicator.classList.toggle("is-active", idx + 1 === current);
+        indicator.classList.toggle("is-complete", idx + 1 < current);
+        const number = indicator.querySelector(".step-number");
+        const dot = indicator.querySelector(".active-dot");
+        if (number) number.textContent = idx + 1 < current ? "✓" : String(idx + 1);
+        if (dot) dot.style.display = idx + 1 === current ? "inline-block" : "none";
+      });
+      connectors.forEach((connector, idx) => {
+        connector.style.width = idx + 1 < current ? "100%" : "0";
+      });
+      if (backBtn) backBtn.disabled = current === 1;
+      if (nextBtn) {
+        nextBtn.disabled = current === total;
+        nextBtn.textContent = current === total ? "Completed" : "Next";
+      }
+    }
+
+    indicators.forEach((indicator) => {
+      indicator.addEventListener("click", () => {
+        const target = Number(indicator.getAttribute("data-step-target"));
+        if (target >= 1 && target <= total) {
+          current = target;
+          render();
+        }
+      });
+    });
+    if (backBtn) {
+      backBtn.addEventListener("click", () => {
+        current = Math.max(1, current - 1);
+        render();
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        current = Math.min(total, current + 1);
+        render();
+      });
+    }
+    render();
+  });
+}
+
+// Profile card tilt/glow effect
+function initProfileCards() {
+  const cards = document.querySelectorAll("[data-profile-card]");
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+  cards.forEach((card) => {
+    const shell = card.querySelector(".pc-card");
+    if (!shell) return;
+
+    function setPointerVars(clientX, clientY) {
+      const rect = shell.getBoundingClientRect();
+      const x = clamp(clientX - rect.left, 0, rect.width);
+      const y = clamp(clientY - rect.top, 0, rect.height);
+      const px = (x / rect.width) * 100;
+      const py = (y / rect.height) * 100;
+      const cx = px - 50;
+      const cy = py - 50;
+      card.style.setProperty("--pointer-x", `${px}%`);
+      card.style.setProperty("--pointer-y", `${py}%`);
+      card.style.setProperty("--pointer-from-left", String(px / 100));
+      card.style.setProperty("--pointer-from-top", String(py / 100));
+      card.style.setProperty("--pointer-from-center", String(Math.min(1, Math.hypot(cx, cy) / 70)));
+      card.style.setProperty("--rotate-x", `${-(cx / 6)}deg`);
+      card.style.setProperty("--rotate-y", `${cy / 7}deg`);
+      card.style.setProperty("--card-opacity", "1");
+    }
+
+    card.addEventListener("pointermove", (event) => setPointerVars(event.clientX, event.clientY));
+    card.addEventListener("pointerenter", (event) => setPointerVars(event.clientX, event.clientY));
+    card.addEventListener("pointerleave", () => {
+      card.style.setProperty("--pointer-x", "50%");
+      card.style.setProperty("--pointer-y", "50%");
+      card.style.setProperty("--pointer-from-left", "0.5");
+      card.style.setProperty("--pointer-from-top", "0.5");
+      card.style.setProperty("--rotate-x", "0deg");
+      card.style.setProperty("--rotate-y", "0deg");
+      card.style.setProperty("--card-opacity", "0");
+    });
+  });
+}
+
 // Auth + dashboard state
 const STORAGE_KEY = "ezremedy_app_v1";
 const signupForm = document.getElementById("signupForm");
@@ -709,5 +809,7 @@ initScrollFloat();
 initCounters();
 initDomeGallery();
 initLiquidBackground();
+initSteppers();
+initProfileCards();
 loadState();
 renderSession();
