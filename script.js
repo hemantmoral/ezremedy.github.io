@@ -214,14 +214,14 @@ function ensureFamily(ownerId) {
 
 function getActiveFamily() {
   const user = getCurrentUser();
-  const ownerId = getFamilyOwnerId(user);
-  if (!ownerId) return null;
+  const ownerId = getFamilyOwnerId(user) || "guest";
   return ensureFamily(ownerId);
 }
 
 function canManageFamily() {
   const user = getCurrentUser();
-  return Boolean(user && user.role === "owner");
+  if (!user) return true;
+  return user.role === "owner";
 }
 
 function setAuthMessage(msg) {
@@ -354,7 +354,7 @@ function renderSession() {
   const loggedIn = Boolean(user);
   currentRoleEl.textContent = loggedIn ? (user.role === "owner" ? "Parent / Owner" : "Family Member") : "Guest";
   currentUserEl.textContent = loggedIn ? user.name : "Not Logged In";
-  sessionInfo.textContent = loggedIn ? `Logged in as ${user.email}` : "Not logged in";
+  sessionInfo.textContent = loggedIn ? `Logged in as ${user.email}` : "Guest mode active (no login required)";
   logoutBtn.classList.toggle("hidden", !loggedIn);
 
   const ownerOnly = canManageFamily();
@@ -365,20 +365,6 @@ function renderSession() {
   reminderTypeSelect.disabled = !ownerOnly;
   reminderTimeInput.disabled = !ownerOnly;
   reminderForm.querySelector("button").disabled = !ownerOnly;
-
-  if (!loggedIn) {
-    memberList.innerHTML = "";
-    reminderList.innerHTML = "";
-    emptyState.style.display = "block";
-    emptyState.textContent = "Please log in to view family dashboard.";
-    reminderEmpty.style.display = "block";
-    reminderEmpty.textContent = "Please log in to view reminder schedules.";
-    totalMembersEl.textContent = "0";
-    medicineDoneEl.textContent = "0";
-    checkupDoneEl.textContent = "0";
-    reminderMemberSelect.innerHTML = '<option value="all">All Members</option>';
-    return;
-  }
 
   renderMembers();
   renderReminders();
