@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="EzRemedy is a modern healthcare platform to manage appointments, medicines, and family health in one place."
+  />
+  <title>EzRemedy | Simplifying Healthcare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="container navbar" aria-label="Primary navigation">
+      <a href="#home" class="logo" aria-label="EzRemedy Home">
+        <span class="logo-icon" aria-hidden="true">+</span>
+        EzRemedy
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navLinks">
+        <span class="sr-only">Toggle menu</span>
+        ☰
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about">About</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#dashboard">Demo</a></li>
+        <li><a href="#benefits">Benefits</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#team">Team</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="home">
+    <section class="hero section">
+      <canvas id="liquidCanvas" class="liquid-canvas" aria-hidden="true"></canvas>
+      <div class="container hero-grid">
+        <div class="hero-content reveal">
+          <p class="eyebrow">Digital Healthcare Platform</p>
+          <h1>EzRemedy - Simplifying Healthcare for You &amp; Your Family</h1>
+          <p class="subtitle">
+            Manage appointments, medicines, and your family's health in one place.
+          </p>
+          <div class="hero-actions">
+            <a href="#dashboard" class="btn btn-primary">Get Started</a>
+            <a href="#about" class="btn btn-secondary">Learn More</a>
+          </div>
+        </div>
+        <div class="hero-card reveal">
+          <h2>Care at a Glance</h2>
+          <ul>
+            <li>Track family health status in one dashboard</li>
+            <li>Never miss medicines or checkups with reminders</li>
+            <li>Book appointments faster and reduce delays</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section section-light">
+      <div class="container reveal">
+        <h2>About EzRemedy</h2>
+        <p>
+          EzRemedy is a digital healthcare platform designed to improve accessibility, reduce delays,
+          and simplify health management through a single unified system. It helps families coordinate
+          care, stay informed, and maintain better health routines every day.
+        </p>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="container">
+        <h2 class="reveal">Core Features</h2>
+        <p class="section-intro reveal">
+          Built around family-first healthcare management, EzRemedy combines essential tools in one
+          seamless experience.
+        </p>
+        <div class="feature-grid">
+          <article class="feature-card feature-main reveal">
+            <h3>Family Health Tracking <span aria-label="Main USP">⭐</span></h3>
+            <ul>
+              <li>Add or remove family members easily</li>
+              <li>Monitor each member's health status</li>
+              <li>Check routine checkup completion</li>
+              <li>Track medicine adherence day by day</li>
+            </ul>
+          </article>
+          <article class="feature-card reveal">
+            <h3>Smart Reminders</h3>
+            <ul>
+              <li>Medicine reminders</li>
+              <li>Appointment alerts</li>
+              <li>Notification system</li>
+            </ul>
+          </article>
+          <article class="feature-card reveal">
+            <h3>Easy Appointments</h3>
+            <ul>
+              <li>Book doctor appointments quickly</li>
+              <li>Reduce waiting time</li>
+              <li>Faster access to healthcare</li>
+            </ul>
+          </article>
+          <article class="feature-card reveal">
+            <h3>Health Records Management</h3>
+            <ul>
+              <li>Store reports securely</li>
+              <li>Organized records by family member</li>
+              <li>Easy sharing with family and doctors</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="section section-light">
+      <div class="container">
+        <h2 class="reveal">How It Works</h2>
+        <div class="steps-grid">
+          <article class="step-card reveal">
+            <span class="step-number">1</span>
+            <h3>Create Account</h3>
+            <p>Sign up in minutes and personalize your healthcare setup.</p>
+          </article>
+          <article class="step-card reveal">
+            <span class="step-number">2</span>
+            <h3>Add Family Members</h3>
+            <p>Add profiles for children, parents, or elderly family members.</p>
+          </article>
+          <article class="step-card reveal">
+            <span class="step-number">3</span>
+            <h3>Set Medicines &amp; Checkups</h3>
+            <p>Configure reminders and routine healthcare schedules.</p>
+          </article>
+          <article class="step-card reveal">
+            <span class="step-number">4</span>
+            <h3>Track Health Status</h3>
+            <p>Use the dashboard to monitor completion and stay on top of care.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboard" class="section">
+      <div class="container">
+        <h2 class="reveal">Demo Family Dashboard</h2>
+        <p class="section-intro reveal">
+          Add family members and update medicine/checkup status in real time.
+        </p>
+        <div class="dashboard-panel reveal">
+          <form id="memberForm" class="member-form" aria-label="Add family member form">
+            <label for="memberName" class="sr-only">Family member name</label>
+            <input
+              id="memberName"
+              type="text"
+              placeholder="Enter family member name"
+              maxlength="40"
+              required
+            />
+            <button type="submit" class="btn btn-primary">Add Family Member</button>
+          </form>
+
+          <div class="dashboard-meta" id="dashboardMeta">
+            <p>Total Members: <strong id="totalMembers">0</strong></p>
+            <p>Medicine Completed: <strong id="medicineDone">0</strong></p>
+            <p>Checkups Completed: <strong id="checkupDone">0</strong></p>
+          </div>
+
+          <ul id="memberList" class="member-list" aria-live="polite"></ul>
+          <p id="emptyState" class="empty-state">No family members added yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="benefits" class="section section-light">
+      <div class="container">
+        <div class="scroll-float reveal" data-scroll-float>
+          <span class="scroll-float-text">EzRemedy Benefits</span>
+        </div>
+        <h2 class="reveal">Benefits</h2>
+        <div class="stats-grid">
+          <article class="stat-card reveal">
+            <p class="stat-label">Families Supported</p>
+            <p class="counter-value" data-counter="1200">0</p>
+          </article>
+          <article class="stat-card reveal">
+            <p class="stat-label">Medicine Adherence</p>
+            <p class="counter-value" data-counter="94">0</p>
+          </article>
+          <article class="stat-card reveal">
+            <p class="stat-label">Timely Checkups</p>
+            <p class="counter-value" data-counter="88">0</p>
+          </article>
+        </div>
+        <div class="benefits-grid">
+          <article class="benefit-card reveal"><h3>Saves Time</h3></article>
+          <article class="benefit-card reveal"><h3>Improves Healthcare Access</h3></article>
+          <article class="benefit-card reveal"><h3>Supports Elderly Care</h3></article>
+          <article class="benefit-card reveal"><h3>Reduces Missed Medicines</h3></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery" class="section">
+      <div class="container">
+        <h2 class="reveal">Health Moments Gallery</h2>
+        <p class="section-intro reveal">Drag left or right to explore a dome-style image wall.</p>
+        <div class="dome-gallery reveal" id="domeGallery" aria-label="Healthcare image gallery">
+          <div class="dome-track" id="domeTrack">
+            <figure class="dome-item"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&auto=format&fit=crop" alt="Doctor consultation" /></figure>
+            <figure class="dome-item"><img src="https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=800&auto=format&fit=crop" alt="Medicine and healthcare tools" /></figure>
+            <figure class="dome-item"><img src="https://images.unsplash.com/photo-1538108149393-fbbd81895907?q=80&w=800&auto=format&fit=crop" alt="Elderly care support" /></figure>
+            <figure class="dome-item"><img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?q=80&w=800&auto=format&fit=crop" alt="Family healthcare planning" /></figure>
+            <figure class="dome-item"><img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=800&auto=format&fit=crop" alt="Healthcare checkup" /></figure>
+            <figure class="dome-item"><img src="https://images.unsplash.com/photo-1581056771107-24ca5f033842?q=80&w=800&auto=format&fit=crop" alt="Doctor with patient" /></figure>
+            <figure class="dome-item"><img src="https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=800&auto=format&fit=crop" alt="Medical records dashboard" /></figure>
+            <figure class="dome-item"><img src="https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=800&auto=format&fit=crop" alt="Home medicine reminders" /></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="team" class="section">
+      <div class="container">
+        <h2 class="reveal">Team</h2>
+        <div class="team-grid">
+          <article class="team-card reveal">
+            <h3>Hemant Moral</h3>
+            <p>Project Contributor</p>
+          </article>
+          <article class="team-card reveal">
+            <h3>Shaurya Kaushal</h3>
+            <p>Project Contributor</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <h3>EzRemedy</h3>
+        <p>Unified digital healthcare experience for families.</p>
+      </div>
+      <div>
+        <h4>Social</h4>
+        <p><a href="#" aria-label="Social placeholder">LinkedIn</a> | <a href="#" aria-label="Social placeholder">Twitter</a> | <a href="#" aria-label="Social placeholder">GitHub</a></p>
+      </div>
+      <div>
+        <h4>Note</h4>
+        <p>Built for educational purposes.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
