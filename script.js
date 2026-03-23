@@ -142,6 +142,8 @@ function initProfileImageFallbacks() {
 
 // Auth + dashboard state
 const STORAGE_KEY = "ezremedy_app_v1";
+const strictModeBtn = document.getElementById("strictModeBtn");
+const demoModeBtn = document.getElementById("demoModeBtn");
 const signupForm = document.getElementById("signupForm");
 const loginForm = document.getElementById("loginForm");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -169,7 +171,8 @@ const reminderEmpty = document.getElementById("reminderEmpty");
 const appState = {
   users: [],
   sessionUserId: null,
-  families: {}
+  families: {},
+  mode: "demo"
 };
 
 function uid() {
@@ -189,6 +192,7 @@ function loadState() {
       appState.users = Array.isArray(parsed.users) ? parsed.users : [];
       appState.sessionUserId = parsed.sessionUserId || null;
       appState.families = parsed.families && typeof parsed.families === "object" ? parsed.families : {};
+      appState.mode = parsed.mode === "strict" ? "strict" : "demo";
     }
   } catch (error) {
     console.error("Failed to parse saved app state", error);
@@ -219,9 +223,21 @@ function getActiveFamily() {
 }
 
 function canManageFamily() {
+  if (appState.mode === "demo") return true;
   const user = getCurrentUser();
-  if (!user) return true;
+  if (!user) return false;
   return user.role === "owner";
+}
+
+function isInteractionAllowed() {
+  if (appState.mode === "demo") return true;
+  return Boolean(getCurrentUser());
+}
+
+function updateModeButtons() {
+  if (!strictModeBtn || !demoModeBtn) return;
+  strictModeBtn.classList.toggle("is-active", appState.mode === "strict");
+  demoModeBtn.classList.toggle("is-active", appState.mode === "demo");
 }
 
 function setAuthMessage(msg) {
@@ -353,11 +369,17 @@ function renderSession() {
   const user = getCurrentUser();
   const loggedIn = Boolean(user);
   currentRoleEl.textContent = loggedIn ? (user.role === "owner" ? "Parent / Owner" : "Family Member") : "Guest";
-  currentUserEl.textContent = loggedIn ? user.name : "Not Logged In";
-  sessionInfo.textContent = loggedIn ? `Logged in as ${user.email}` : "Guest mode active (no login required)";
+  currentUserEl.textContent = loggedIn ? user.name : appState.mode === "demo" ? "Guest (Demo)" : "Not Logged In";
+  sessionInfo.textContent = loggedIn
+    ? `Logged in as ${user.email}`
+    : appState.mode === "demo"
+      ? "Guest mode active (no login required)"
+      : "Strict mode active: login required for interaction";
   logoutBtn.classList.toggle("hidden", !loggedIn);
+  updateModeButtons();
 
-  const ownerOnly = canManageFamily();
+  const interactionAllowed = isInteractionAllowed();
+  const ownerOnly = interactionAllowed && canManageFamily();
   memberNameInput.disabled = !ownerOnly;
   memberForm.querySelector("button").disabled = !ownerOnly;
   reminderTitleInput.disabled = !ownerOnly;
@@ -365,6 +387,20 @@ function renderSession() {
   reminderTypeSelect.disabled = !ownerOnly;
   reminderTimeInput.disabled = !ownerOnly;
   reminderForm.querySelector("button").disabled = !ownerOnly;
+
+  if (!interactionAllowed) {
+    memberList.innerHTML = "";
+    reminderList.innerHTML = "";
+    emptyState.style.display = "block";
+    emptyState.textContent = "Login required in Strict mode.";
+    reminderEmpty.style.display = "block";
+    reminderEmpty.textContent = "Login required in Strict mode.";
+    totalMembersEl.textContent = "0";
+    medicineDoneEl.textContent = "0";
+    checkupDoneEl.textContent = "0";
+    reminderMemberSelect.innerHTML = '<option value="all">All Members</option>';
+    return;
+  }
 
   renderMembers();
   renderReminders();
@@ -449,9 +485,26 @@ if (logoutBtn) {
   });
 }
 
+if (strictModeBtn && demoModeBtn) {
+  strictModeBtn.addEventListener("click", () => {
+    appState.mode = "strict";
+    saveState();
+    renderSession();
+  });
+  demoModeBtn.addEventListener("click", () => {
+    appState.mode = "demo";
+    saveState();
+    renderSession();
+  });
+}
+
 if (memberForm) {
   memberForm.addEventListener("submit", (event) => {
     event.preventDefault();
+    if (!isInteractionAllowed()) {
+      setAuthMessage("Strict mode is active. Please log in first.");
+      return;
+    }
     if (!canManageFamily()) {
       setAuthMessage("Only parent/owner can add family members.");
       return;
@@ -470,6 +523,10 @@ if (memberForm) {
 if (reminderForm) {
   reminderForm.addEventListener("submit", (event) => {
     event.preventDefault();
+    if (!isInteractionAllowed()) {
+      setAuthMessage("Strict mode is active. Please log in first.");
+      return;
+    }
     if (!canManageFamily()) {
       setAuthMessage("Only parent/owner can configure reminders.");
       return;
