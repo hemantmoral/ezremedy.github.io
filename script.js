@@ -18,7 +18,16 @@ if (menuToggle && navLinks) {
   });
 }
 
-// Demo dashboard data/state
+// Auth + dashboard state
+const STORAGE_KEY = "ezremedy_app_v1";
+const signupForm = document.getElementById("signupForm");
+const loginForm = document.getElementById("loginForm");
+const logoutBtn = document.getElementById("logoutBtn");
+const authMessage = document.getElementById("authMessage");
+const sessionInfo = document.getElementById("sessionInfo");
+const currentRoleEl = document.getElementById("currentRole");
+const currentUserEl = document.getElementById("currentUser");
+
 const memberForm = document.getElementById("memberForm");
 const memberNameInput = document.getElementById("memberName");
 const memberList = document.getElementById("memberList");
@@ -27,81 +36,346 @@ const totalMembersEl = document.getElementById("totalMembers");
 const medicineDoneEl = document.getElementById("medicineDone");
 const checkupDoneEl = document.getElementById("checkupDone");
 
-const members = [];
+const reminderForm = document.getElementById("reminderForm");
+const reminderTitleInput = document.getElementById("reminderTitle");
+const reminderMemberSelect = document.getElementById("reminderMember");
+const reminderTypeSelect = document.getElementById("reminderType");
+const reminderTimeInput = document.getElementById("reminderTime");
+const reminderList = document.getElementById("reminderList");
+const reminderEmpty = document.getElementById("reminderEmpty");
+
+const appState = {
+  users: [],
+  sessionUserId: null,
+  families: {}
+};
+
+function uid() {
+  return `${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object") {
+      appState.users = Array.isArray(parsed.users) ? parsed.users : [];
+      appState.sessionUserId = parsed.sessionUserId || null;
+      appState.families = parsed.families && typeof parsed.families === "object" ? parsed.families : {};
+    }
+  } catch (error) {
+    console.error("Failed to parse saved app state", error);
+  }
+}
+
+function getCurrentUser() {
+  return appState.users.find((u) => u.id === appState.sessionUserId) || null;
+}
+
+function getFamilyOwnerId(user) {
+  if (!user) return null;
+  return user.role === "owner" ? user.id : user.ownerId || null;
+}
+
+function ensureFamily(ownerId) {
+  if (!ownerId) return null;
+  if (!appState.families[ownerId]) {
+    appState.families[ownerId] = { members: [], reminders: [] };
+  }
+  return appState.families[ownerId];
+}
+
+function getActiveFamily() {
+  const user = getCurrentUser();
+  const ownerId = getFamilyOwnerId(user);
+  if (!ownerId) return null;
+  return ensureFamily(ownerId);
+}
+
+function canManageFamily() {
+  const user = getCurrentUser();
+  return Boolean(user && user.role === "owner");
+}
+
+function setAuthMessage(msg) {
+  authMessage.textContent = msg || "";
+}
 
 function updateStats() {
+  const family = getActiveFamily();
+  const members = family ? family.members : [];
   const totalMembers = members.length;
   const medicineDone = members.filter((member) => member.medicineTaken).length;
   const checkupDone = members.filter((member) => member.checkupDone).length;
-
   totalMembersEl.textContent = String(totalMembers);
   medicineDoneEl.textContent = String(medicineDone);
   checkupDoneEl.textContent = String(checkupDone);
-
   emptyState.style.display = totalMembers === 0 ? "block" : "none";
 }
 
-function createMemberItem(member, index) {
-  const item = document.createElement("li");
-  item.className = "member-item";
-
-  const name = document.createElement("span");
-  name.className = "member-name";
-  name.textContent = member.name;
-
-  const checkGroup = document.createElement("div");
-  checkGroup.className = "check-group";
-
-  const medicineLabel = document.createElement("label");
-  const medicineCheckbox = document.createElement("input");
-  medicineCheckbox.type = "checkbox";
-  medicineCheckbox.checked = member.medicineTaken;
-  medicineCheckbox.addEventListener("change", (event) => {
-    members[index].medicineTaken = event.target.checked;
-    updateStats();
+function renderMemberOptions() {
+  const family = getActiveFamily();
+  const members = family ? family.members : [];
+  reminderMemberSelect.innerHTML = '<option value="all">All Members</option>';
+  members.forEach((member) => {
+    const option = document.createElement("option");
+    option.value = member.id;
+    option.textContent = member.name;
+    reminderMemberSelect.appendChild(option);
   });
-  medicineLabel.append(medicineCheckbox, " Medicine Taken");
-
-  const checkupLabel = document.createElement("label");
-  const checkupCheckbox = document.createElement("input");
-  checkupCheckbox.type = "checkbox";
-  checkupCheckbox.checked = member.checkupDone;
-  checkupCheckbox.addEventListener("change", (event) => {
-    members[index].checkupDone = event.target.checked;
-    updateStats();
-  });
-  checkupLabel.append(checkupCheckbox, " Checkup Done");
-
-  checkGroup.append(medicineLabel, checkupLabel);
-  item.append(name, checkGroup);
-  return item;
 }
 
 function renderMembers() {
+  const family = getActiveFamily();
+  const user = getCurrentUser();
+  const members = family ? family.members : [];
   memberList.innerHTML = "";
-  members.forEach((member, index) => {
-    memberList.appendChild(createMemberItem(member, index));
+
+  members.forEach((member) => {
+    const item = document.createElement("li");
+    item.className = "member-item";
+    const name = document.createElement("span");
+    name.className = "member-name";
+    name.textContent = member.name;
+
+    const badge = document.createElement("span");
+    badge.className = member.role === "owner" ? "badge-owner" : "badge-member";
+    badge.textContent = member.role === "owner" ? "Owner" : "Member";
+
+    const checkGroup = document.createElement("div");
+    checkGroup.className = "check-group";
+
+    const medicineLabel = document.createElement("label");
+    const medicineCheckbox = document.createElement("input");
+    medicineCheckbox.type = "checkbox";
+    medicineCheckbox.checked = member.medicineTaken;
+    medicineCheckbox.disabled = !canManageFamily();
+    medicineCheckbox.addEventListener("change", (event) => {
+      member.medicineTaken = event.target.checked;
+      saveState();
+      updateStats();
+    });
+    medicineLabel.append(medicineCheckbox, " Medicine Taken");
+
+    const checkupLabel = document.createElement("label");
+    const checkupCheckbox = document.createElement("input");
+    checkupCheckbox.type = "checkbox";
+    checkupCheckbox.checked = member.checkupDone;
+    checkupCheckbox.disabled = !canManageFamily();
+    checkupCheckbox.addEventListener("change", (event) => {
+      member.checkupDone = event.target.checked;
+      saveState();
+      updateStats();
+    });
+    checkupLabel.append(checkupCheckbox, " Checkup Done");
+
+    checkGroup.append(medicineLabel, checkupLabel);
+    item.append(name, badge, checkGroup);
+    memberList.appendChild(item);
   });
+
+  if (user && user.role === "member" && members.length === 0) {
+    emptyState.textContent = "No family linked yet. Ask the owner to add members.";
+  } else {
+    emptyState.textContent = "No family members added yet.";
+  }
   updateStats();
+  renderMemberOptions();
+}
+
+function renderReminders() {
+  const family = getActiveFamily();
+  const user = getCurrentUser();
+  const reminders = family ? family.reminders : [];
+  reminderList.innerHTML = "";
+
+  reminders.forEach((reminder) => {
+    const item = document.createElement("li");
+    item.className = "reminder-item";
+    const memberName =
+      reminder.memberId === "all"
+        ? "All Members"
+        : (family.members.find((m) => m.id === reminder.memberId) || {}).name || "Unknown Member";
+    item.innerHTML = `<strong>${reminder.title}</strong><span>${reminder.type}</span><span>${reminder.time}</span><span>${memberName}</span>`;
+
+    const statusWrap = document.createElement("label");
+    statusWrap.className = "check-group";
+    const done = document.createElement("input");
+    done.type = "checkbox";
+    done.checked = Boolean(reminder.done);
+    done.disabled = !canManageFamily();
+    done.addEventListener("change", (event) => {
+      reminder.done = event.target.checked;
+      saveState();
+    });
+    statusWrap.append(done, " Completed");
+    item.appendChild(statusWrap);
+    reminderList.appendChild(item);
+  });
+
+  const hasReminders = reminders.length > 0;
+  reminderEmpty.style.display = hasReminders ? "none" : "block";
+  if (user && user.role === "member" && !hasReminders) {
+    reminderEmpty.textContent = "No routines configured by the owner yet.";
+  } else {
+    reminderEmpty.textContent = "No reminders configured yet.";
+  }
+}
+
+function renderSession() {
+  const user = getCurrentUser();
+  const loggedIn = Boolean(user);
+  currentRoleEl.textContent = loggedIn ? (user.role === "owner" ? "Parent / Owner" : "Family Member") : "Guest";
+  currentUserEl.textContent = loggedIn ? user.name : "Not Logged In";
+  sessionInfo.textContent = loggedIn ? `Logged in as ${user.email}` : "Not logged in";
+  logoutBtn.classList.toggle("hidden", !loggedIn);
+
+  const ownerOnly = canManageFamily();
+  memberNameInput.disabled = !ownerOnly;
+  memberForm.querySelector("button").disabled = !ownerOnly;
+  reminderTitleInput.disabled = !ownerOnly;
+  reminderMemberSelect.disabled = !ownerOnly;
+  reminderTypeSelect.disabled = !ownerOnly;
+  reminderTimeInput.disabled = !ownerOnly;
+  reminderForm.querySelector("button").disabled = !ownerOnly;
+
+  if (!loggedIn) {
+    memberList.innerHTML = "";
+    reminderList.innerHTML = "";
+    emptyState.style.display = "block";
+    emptyState.textContent = "Please log in to view family dashboard.";
+    reminderEmpty.style.display = "block";
+    reminderEmpty.textContent = "Please log in to view reminder schedules.";
+    totalMembersEl.textContent = "0";
+    medicineDoneEl.textContent = "0";
+    checkupDoneEl.textContent = "0";
+    reminderMemberSelect.innerHTML = '<option value="all">All Members</option>';
+    return;
+  }
+
+  renderMembers();
+  renderReminders();
+}
+
+if (signupForm) {
+  signupForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const name = document.getElementById("signupName").value.trim();
+    const email = document.getElementById("signupEmail").value.trim().toLowerCase();
+    const password = document.getElementById("signupPassword").value;
+    const role = document.getElementById("signupRole").value;
+    if (!name || !email || !password) {
+      setAuthMessage("Please fill all sign up fields.");
+      return;
+    }
+    if (appState.users.some((u) => u.email === email)) {
+      setAuthMessage("Account already exists with this email.");
+      return;
+    }
+
+    let ownerId = null;
+    if (role === "owner") {
+      ownerId = uid();
+    } else {
+      const owners = appState.users.filter((u) => u.role === "owner");
+      if (!owners.length) {
+        setAuthMessage("Please create a parent/owner account first.");
+        return;
+      }
+      ownerId = owners[0].id;
+    }
+
+    const newUser = { id: uid(), name, email, password, role, ownerId: role === "owner" ? null : ownerId };
+    appState.users.push(newUser);
+    if (role === "owner") {
+      ensureFamily(newUser.id);
+      appState.families[newUser.id].members.push({
+        id: uid(),
+        name: `${name} (Owner)`,
+        role: "owner",
+        medicineTaken: false,
+        checkupDone: false
+      });
+    } else {
+      const family = ensureFamily(ownerId);
+      family.members.push({ id: uid(), name, role: "member", medicineTaken: false, checkupDone: false });
+    }
+
+    appState.sessionUserId = newUser.id;
+    saveState();
+    signupForm.reset();
+    setAuthMessage("Account created successfully. You are now logged in.");
+    renderSession();
+  });
+}
+
+if (loginForm) {
+  loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+    const user = appState.users.find((u) => u.email === email && u.password === password);
+    if (!user) {
+      setAuthMessage("Invalid email or password.");
+      return;
+    }
+    appState.sessionUserId = user.id;
+    saveState();
+    loginForm.reset();
+    setAuthMessage("Login successful.");
+    renderSession();
+  });
+}
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    appState.sessionUserId = null;
+    saveState();
+    setAuthMessage("Logged out successfully.");
+    renderSession();
+  });
 }
 
 if (memberForm) {
   memberForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    const name = memberNameInput.value.trim();
-    if (!name) {
+    if (!canManageFamily()) {
+      setAuthMessage("Only parent/owner can add family members.");
       return;
     }
-
-    members.push({
-      name,
-      medicineTaken: false,
-      checkupDone: false
-    });
-
+    const name = memberNameInput.value.trim();
+    if (!name) return;
+    const family = getActiveFamily();
+    family.members.push({ id: uid(), name, role: "member", medicineTaken: false, checkupDone: false });
+    saveState();
     memberNameInput.value = "";
     memberNameInput.focus();
     renderMembers();
+  });
+}
+
+if (reminderForm) {
+  reminderForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!canManageFamily()) {
+      setAuthMessage("Only parent/owner can configure reminders.");
+      return;
+    }
+    const title = reminderTitleInput.value.trim();
+    const memberId = reminderMemberSelect.value;
+    const type = reminderTypeSelect.value;
+    const time = reminderTimeInput.value;
+    if (!title || !time) return;
+    const family = getActiveFamily();
+    family.reminders.push({ id: uid(), title, memberId, type, time, done: false });
+    saveState();
+    reminderForm.reset();
+    renderReminders();
   });
 }
 
@@ -435,4 +709,5 @@ initScrollFloat();
 initCounters();
 initDomeGallery();
 initLiquidBackground();
-updateStats();
+loadState();
+renderSession();

@@ -211,6 +211,7 @@ p {
 .feature-card,
 .step-card,
 .dashboard-panel,
+.auth-card,
 .benefit-card,
 .team-card {
   background: var(--surface);
@@ -293,6 +294,56 @@ p {
 
 .dashboard-panel {
   padding: 1.2rem;
+  margin-top: 1rem;
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.auth-card {
+  padding: 1.2rem;
+}
+
+.auth-form,
+.reminder-form {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.auth-form input,
+.auth-form select,
+.reminder-form input,
+.reminder-form select {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.72rem 0.9rem;
+  font: inherit;
+}
+
+.auth-message {
+  margin-top: 0.8rem;
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+.session-info {
+  margin: 0.7rem 0;
+  color: var(--muted);
+}
+
+.hidden {
+  display: none;
+}
+
+.dashboard-role-bar {
+  margin: 0.8rem 0 0.3rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.4rem;
+  color: var(--muted);
 }
 
 .member-form {
@@ -327,6 +378,46 @@ p {
   margin-top: 1rem;
   display: grid;
   gap: 0.75rem;
+}
+
+.reminder-list {
+  list-style: none;
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.reminder-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reminder-item strong {
+  color: var(--text);
+}
+
+.badge-owner,
+.badge-member {
+  font-size: 0.78rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-weight: 700;
+}
+
+.badge-owner {
+  background: #d9f4ef;
+  color: #0c7c66;
+}
+
+.badge-member {
+  background: #e8ecff;
+  color: #3546b6;
 }
 
 .member-item {
@@ -512,6 +603,10 @@ p {
   }
 
   .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-grid {
     grid-template-columns: 1fr;
   }
 

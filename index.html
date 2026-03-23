@@ -31,6 +31,7 @@
         <li><a href="#about">About</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#auth">Account</a></li>
         <li><a href="#dashboard">Demo</a></li>
         <li><a href="#benefits">Benefits</a></li>
         <li><a href="#gallery">Gallery</a></li>
@@ -149,12 +150,51 @@
       </div>
     </section>
 
+    <section id="auth" class="section section-light">
+      <div class="container">
+        <h2 class="reveal">Account Access</h2>
+        <p class="section-intro reveal">
+          Create an account and log in to manage reminders, schedules, and family health updates.
+        </p>
+        <div class="auth-grid">
+          <article class="auth-card reveal">
+            <h3>Sign Up</h3>
+            <form id="signupForm" class="auth-form">
+              <input id="signupName" type="text" placeholder="Full Name" required />
+              <input id="signupEmail" type="email" placeholder="Email" required />
+              <input id="signupPassword" type="password" placeholder="Password" minlength="4" required />
+              <select id="signupRole" required>
+                <option value="owner">Parent / Owner</option>
+                <option value="member">Family Member</option>
+              </select>
+              <button type="submit" class="btn btn-primary">Create Account</button>
+            </form>
+          </article>
+          <article class="auth-card reveal">
+            <h3>Login</h3>
+            <form id="loginForm" class="auth-form">
+              <input id="loginEmail" type="email" placeholder="Email" required />
+              <input id="loginPassword" type="password" placeholder="Password" required />
+              <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <div id="sessionInfo" class="session-info"></div>
+            <button id="logoutBtn" class="btn btn-secondary hidden" type="button">Logout</button>
+          </article>
+        </div>
+        <p id="authMessage" class="auth-message"></p>
+      </div>
+    </section>
+
     <section id="dashboard" class="section">
       <div class="container">
         <h2 class="reveal">Demo Family Dashboard</h2>
         <p class="section-intro reveal">
           Add family members and update medicine/checkup status in real time.
         </p>
+        <div class="dashboard-role-bar reveal">
+          <p>Role: <strong id="currentRole">Guest</strong></p>
+          <p>User: <strong id="currentUser">Not Logged In</strong></p>
+        </div>
         <div class="dashboard-panel reveal">
           <form id="memberForm" class="member-form" aria-label="Add family member form">
             <label for="memberName" class="sr-only">Family member name</label>
@@ -176,6 +216,25 @@
 
           <ul id="memberList" class="member-list" aria-live="polite"></ul>
           <p id="emptyState" class="empty-state">No family members added yet.</p>
+        </div>
+
+        <div class="dashboard-panel reveal">
+          <h3>Reminder Configuration & Routine Schedules</h3>
+          <form id="reminderForm" class="reminder-form">
+            <input id="reminderTitle" type="text" placeholder="Reminder title (Medicine/Checkup)" required />
+            <select id="reminderMember">
+              <option value="all">All Members</option>
+            </select>
+            <select id="reminderType">
+              <option value="medicine">Medicine</option>
+              <option value="checkup">Checkup</option>
+              <option value="appointment">Appointment</option>
+            </select>
+            <input id="reminderTime" type="time" required />
+            <button type="submit" class="btn btn-primary">Add Routine</button>
+          </form>
+          <ul id="reminderList" class="reminder-list"></ul>
+          <p id="reminderEmpty" class="empty-state">No reminders configured yet.</p>
         </div>
       </div>
     </section>
