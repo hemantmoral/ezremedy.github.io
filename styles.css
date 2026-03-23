@@ -291,7 +291,7 @@ p {
   padding: 0;
 }
 
-.step-number {
+.step-card .step-number {
   width: 2rem;
   height: 2rem;
   display: inline-grid;
@@ -372,9 +372,12 @@ p {
 }
 
 .step-indicator {
+  padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .step-indicator-inner {
@@ -387,6 +390,20 @@ p {
   background: #d4e0e7;
   color: #5e7381;
   font-weight: 700;
+  line-height: 1;
+}
+
+.step-indicator .step-number {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: inherit;
+}
+
+.active-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: #fff;
 }
 
 .step-indicator.is-active .step-indicator-inner,
@@ -443,6 +460,9 @@ p {
   color: #7b8f9b;
   font-weight: 600;
   cursor: pointer;
+  font: inherit;
+  padding: 0.35rem 0.55rem;
+  border-radius: 8px;
 }
 
 .next-button {
@@ -453,6 +473,7 @@ p {
   border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
+  font: inherit;
 }
 
 .back-button:disabled,

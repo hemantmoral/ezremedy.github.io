@@ -50,6 +50,9 @@ function initSteppers() {
         nextBtn.disabled = current === total;
         nextBtn.textContent = current === total ? "Completed" : "Next";
       }
+      if (backBtn) {
+        backBtn.style.visibility = current === 1 ? "hidden" : "visible";
+      }
     }
 
     indicators.forEach((indicator) => {
@@ -114,6 +117,25 @@ function initProfileCards() {
       card.style.setProperty("--rotate-x", "0deg");
       card.style.setProperty("--rotate-y", "0deg");
       card.style.setProperty("--card-opacity", "0");
+    });
+  });
+}
+
+function initProfileImageFallbacks() {
+  const avatars = document.querySelectorAll(".profile-avatar");
+  avatars.forEach((img) => {
+    const sources = (img.dataset.fallbacks || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    let idx = 0;
+    img.addEventListener("error", () => {
+      idx += 1;
+      if (idx < sources.length) {
+        img.src = sources[idx];
+      } else {
+        img.alt = `${img.alt} (image unavailable)`;
+      }
     });
   });
 }
@@ -811,5 +833,6 @@ initDomeGallery();
 initLiquidBackground();
 initSteppers();
 initProfileCards();
+initProfileImageFallbacks();
 loadState();
 renderSession();
